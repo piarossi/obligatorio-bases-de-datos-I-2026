@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plantel | Torneo Interfacultades</title>
+<style>body{font-family:system-ui,sans-serif;max-width:950px;margin:45px auto;padding:0 20px;color:#20242a;background:#f7f8fb}p{color:#5b6470}table{border-collapse:collapse;width:100%;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 14px #0001}th,td{padding:14px 18px;text-align:left;border-bottom:1px solid #e7e9ef}th{background:#e9eef9}a{color:#1656a6;text-decoration:none}</style>
+</head><body>
+<p><a href="{{ url_for('listar_equipos') }}">← Volver a equipos</a></p><h1>{{ equipo.equipo }}</h1><p>{{ equipo.facultad }} · {{ jugadores|length }} jugadores</p>
+<table><thead><tr><th>Camiseta</th><th>Jugador</th><th>Tipo</th><th>Capitán</th></tr></thead><tbody>
+{% for j in jugadores %}<tr><td>{{ j.numero_camiseta }}</td><td>{{ j.nombre }} {{ j.apellido }}</td><td>{{ j.tipo }}</td><td>{{ 'Sí' if j.es_capitan else '—' }}</td></tr>{% else %}<tr><td colspan="4">Plantel vacío</td></tr>{% endfor %}
+</tbody></table></body></html>

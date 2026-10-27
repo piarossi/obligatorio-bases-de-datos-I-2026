@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Equipos | Torneo Interfacultades</title>
+<style>body{font-family:system-ui,sans-serif;max-width:950px;margin:45px auto;padding:0 20px;color:#20242a;background:#f7f8fb}h1{margin-bottom:5px}p{color:#5b6470}table{border-collapse:collapse;width:100%;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 14px #0001}th,td{padding:14px 18px;text-align:left;border-bottom:1px solid #e7e9ef}th{background:#e9eef9}a{color:#1656a6;text-decoration:none}a:hover{text-decoration:underline}</style>
+</head><body>
+<h1>Torneo Interfacultades de Fútbol 5</h1><p>Equipos registrados · {{ equipos|length }} equipos</p>
+<table><thead><tr><th>Equipo</th><th>Facultad</th><th>Jugadores</th></tr></thead><tbody>
+{% for e in equipos %}<tr><td><a href="{{ url_for('ver_plantel', id_equipo=e.id_equipo) }}">{{ e.equipo }}</a></td><td>{{ e.facultad }}</td><td>{{ e.jugadores }}</td></tr>{% else %}<tr><td colspan="3">No hay equipos registrados.</td></tr>{% endfor %}
+</tbody></table></body></html>
