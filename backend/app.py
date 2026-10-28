@@ -11,6 +11,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 load_dotenv(RAIZ / '.env')
 
 app = Flask(__name__, template_folder=str(RAIZ / 'templates'))
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'solo-desarrollo-local')
 
 
 def conectar():
@@ -70,7 +71,7 @@ def ver_plantel(id_equipo):
                 if equipo is None:
                     abort(404)
                 cursor.execute('''
-                    SELECT j.nombre, j.apellido, j.tipo, p.numero_camiseta,
+                    SELECT j.ci, j.nombre, j.apellido, j.tipo, p.numero_camiseta,
                            (e.ci_capitan = j.ci) AS es_capitan
                     FROM equipo_jugador_torneo p
                     JOIN jugador j ON j.ci = p.ci_jugador
@@ -88,6 +89,36 @@ def ver_plantel(id_equipo):
         app.logger.error('Error consultando plantel: %s', exc)
         return 'No se pudo consultar el plantel.', 500
 
+
+
+@app.get('/jugadores/<ci>/detalle')
+def detalle_jugador(ci):
+    try:
+        cn = conectar()
+        try:
+            cursor = cn.cursor(dictionary=True)
+            try:
+                cursor.execute('''
+                    SELECT j.ci, j.nombre, j.apellido, j.email,
+                           j.fecha_nacimiento, j.tipo, j.activo,
+                           f.nombre AS facultad
+                    FROM jugador j JOIN facultad f ON f.id_facultad = j.id_facultad
+                    WHERE j.ci = %s
+                ''', (ci,))
+                jugador = cursor.fetchone()
+            finally:
+                cursor.close()
+        finally:
+            cn.close()
+    except (Error, KeyError, ValueError) as exc:
+        app.logger.error('Error consultando ficha del jugador: %s', exc)
+        return 'No se pudo consultar la ficha.', 500
+    if jugador is None:
+        abort(404)
+    return render_template('jugador_detalle.html', jugador=jugador)
+
+from jugadores import registrar
+app.register_blueprint(registrar(conectar))
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=False)

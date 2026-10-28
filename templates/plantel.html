@@ -5,5 +5,5 @@
 </head><body>
 <p><a href="{{ url_for('listar_equipos') }}">← Volver a equipos</a></p><h1>{{ equipo.equipo }}</h1><p>{{ equipo.facultad }} · {{ jugadores|length }} jugadores</p>
 <table><thead><tr><th>Camiseta</th><th>Jugador</th><th>Tipo</th><th>Capitán</th></tr></thead><tbody>
-{% for j in jugadores %}<tr><td>{{ j.numero_camiseta }}</td><td>{{ j.nombre }} {{ j.apellido }}</td><td>{{ j.tipo }}</td><td>{{ 'Sí' if j.es_capitan else '—' }}</td></tr>{% else %}<tr><td colspan="4">Plantel vacío</td></tr>{% endfor %}
+{% for j in jugadores %}<tr><td>{{ j.numero_camiseta }}</td><td><a href="{{ url_for('detalle_jugador', ci=j.ci) }}">{{ j.nombre }} {{ j.apellido }}</a></td><td>{{ j.tipo }}</td><td>{{ 'Sí' if j.es_capitan else '—' }}</td></tr>{% else %}<tr><td colspan="4">Plantel vacío</td></tr>{% endfor %}
 </tbody></table></body></html>
