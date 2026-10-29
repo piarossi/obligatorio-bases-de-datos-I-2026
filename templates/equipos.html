@@ -1,6 +1,9 @@
 {% extends 'base.html' %}{% block title %}Equipos{% endblock %}{% block content %}
+<p><a href="{{ url_for('equipos_abm.nuevo') }}">+ Nuevo equipo</a></p>
+
 <div class="heading"><div><p class="eyebrow">Torneo 2026 · Gestión</p><h1>Equipos participantes</h1><p class="sub">Consultá los equipos y sus planteles registrados.</p></div><span class="pill">{{ equipos|length }} equipos</span></div>
 <section class="card table-wrap"><table><thead><tr><th>Equipo</th><th>Facultad</th><th>Plantel</th><th></th></tr></thead><tbody>
-{% for e in equipos %}<tr><td><a class="link-strong" href="{{ url_for('ver_plantel', id_equipo=e.id_equipo) }}">{{ e.equipo }}</a></td><td>{{ e.facultad }}</td><td><span class="pill">{{ e.jugadores }} jugadores</span></td><td><a href="{{ url_for('ver_plantel', id_equipo=e.id_equipo) }}">Ver plantel →</a></td></tr>{% else %}<tr><td colspan="4" class="empty">Todavía no hay equipos registrados.</td></tr>{% endfor %}
+{% for e in equipos %}<tr><td><a class="link-strong" href="{{ url_for('ver_plantel', id_equipo=e.id_equipo) }}">{{ e.equipo }}</a></td><td>{{ e.facultad }}</td><td><span class="pill">{{ e.jugadores }} jugadores</span></td><td><a href="{{ url_for('ver_plantel', id_equipo=e.id_equipo) }}">Ver plantel →</a> <a href="{{ url_for('equipos_abm.editar', id_equipo=e.id_equipo) }}">Editar</a>
+    {% if e.activo %}<form action="{{ url_for('equipos_abm.baja', id_equipo=e.id_equipo) }}" method="post" style="display:inline" onsubmit="return confirm('¿Dar de baja este equipo?')"><button type="submit">Dar de baja</button></form>{% else %}<small>Inactivo</small>{% endif %}</td></tr>{% else %}<tr><td colspan="4" class="empty">Todavía no hay equipos registrados.</td></tr>{% endfor %}
 </tbody></table></section>
 {% endblock %}

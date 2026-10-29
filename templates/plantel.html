@@ -1,4 +1,6 @@
 {% extends 'base.html' %}{% block title %}Plantel{% endblock %}{% block content %}
+<p><a class="back" href="{{ url_for('planteles.gestionar',id_equipo=equipo.id_equipo) }}#agregar">+ Agregar jugador</a> &nbsp; <a class="back" href="{{ url_for('planteles.gestionar',id_equipo=equipo.id_equipo) }}">Gestionar plantel</a></p>
+
 <a class="back" href="{{ url_for('listar_equipos') }}">← Volver a equipos</a>
 <div class="heading"><div><p class="eyebrow">Plantel registrado</p><h1>{{ equipo.equipo }}</h1><p class="sub">{{ equipo.facultad }} · {{ jugadores|length }} jugadores</p></div></div>
 <section class="card table-wrap"><table><thead><tr><th>Camiseta</th><th>Jugador</th><th>Tipo</th><th>Capitán</th></tr></thead><tbody>

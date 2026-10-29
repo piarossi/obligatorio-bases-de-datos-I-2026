@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Gestionar plantel{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('ver_plantel',id_equipo=equipo.id_equipo) }}">← Volver al plantel</a>
+<div class="heading"><div><p class="eyebrow">Inscripción</p><h1>Gestionar plantel</h1><p class="sub">{{ equipo.nombre_equipo }} · {{ plantel|length }}/10 jugadores · Estado: {{ equipo.estado }}</p></div></div>
+{% if not editable %}<section class="card" style="padding:18px"><strong>Solo lectura:</strong> no se permiten cambios porque el torneo no está en inscripción o el equipo está inactivo.</section>{% endif %}
+<section id="agregar" class="card" style="padding:22px;margin-bottom:20px">
+<h2>Agregar jugador</h2>
+<p>Seleccioná un jugador activo de esta facultad que todavía no esté inscripto en la edición.</p>
+{% if editable %}
+<form method="post" action="{{ url_for('planteles.agregar',id_equipo=equipo.id_equipo) }}">
+<input type="hidden" name="_csrf" value="{{ csrf }}">
+<label>Jugador <select name="ci" required><option value="">Seleccionar jugador</option>{% for j in candidatos %}<option value="{{ j.ci }}">{{ j.apellido }}, {{ j.nombre }} ({{ j.tipo }})</option>{% endfor %}</select></label>
+<label>Número de camiseta <input type="number" name="numero_camiseta" min="1" max="99" required></label>
+<button type="submit">Agregar jugador</button></form>
+{% if not candidatos %}<p>No hay jugadores disponibles para inscribir.</p>{% endif %}
+{% endif %}
+</section>
+<section class="card table-wrap"><h2 style="padding:16px">Plantel actual</h2><table><thead><tr><th>Camiseta</th><th>Jugador</th><th>Tipo</th><th>Capitán</th><th>Acciones</th></tr></thead><tbody>
+{% for j in plantel %}<tr><td>#{{ j.numero_camiseta }}</td><td><a href="{{ url_for('detalle_jugador', ci=j.ci) }}">{{ j.nombre }} {{ j.apellido }}</a></td><td>{{ j.tipo }}</td><td>{% if j.ci == equipo.ci_capitan %}Sí{% else %}—{% endif %}</td><td>{% if editable %}
+{% if j.ci != equipo.ci_capitan and j.activo %}<form method="post" action="{{ url_for('planteles.capitan',id_equipo=equipo.id_equipo) }}" style="display:inline"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="ci" value="{{ j.ci }}"><button type="submit">Designar capitán</button></form>{% endif %}
+{% if j.ci != equipo.ci_capitan %}<form method="post" action="{{ url_for('planteles.retirar',id_equipo=equipo.id_equipo) }}" style="display:inline" onsubmit="return confirm('¿Retirar al jugador del plantel?')"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="ci" value="{{ j.ci }}"><button type="submit">Retirar</button></form>{% endif %}
+{% endif %}</td></tr>{% else %}<tr><td colspan="5">Todavía no hay integrantes.</td></tr>{% endfor %}
+</tbody></table></section>
+{% endblock %}

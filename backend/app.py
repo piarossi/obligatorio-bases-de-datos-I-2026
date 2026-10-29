@@ -35,7 +35,7 @@ def listar_equipos():
             cursor = cn.cursor(dictionary=True)
             try:
                 cursor.execute('''
-                    SELECT e.id_equipo, e.nombre AS equipo, f.nombre AS facultad,
+                    SELECT e.id_equipo, e.activo, e.nombre AS equipo, f.nombre AS facultad,
                            COUNT(p.ci_jugador) AS jugadores
                     FROM equipo AS e
                     JOIN facultad AS f ON f.id_facultad = e.id_facultad
@@ -119,6 +119,12 @@ def detalle_jugador(ci):
 
 from jugadores import registrar
 app.register_blueprint(registrar(conectar))
+
+from equipos_abm import registrar_equipos
+app.register_blueprint(registrar_equipos(conectar))
+
+from planteles import registrar_planteles
+app.register_blueprint(registrar_planteles(conectar))
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=False)
