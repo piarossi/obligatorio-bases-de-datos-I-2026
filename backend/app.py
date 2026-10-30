@@ -126,5 +126,8 @@ app.register_blueprint(registrar_equipos(conectar))
 from planteles import registrar_planteles
 app.register_blueprint(registrar_planteles(conectar))
 
+from partidos import registrar_partidos
+app.register_blueprint(registrar_partidos(conectar))
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=False)

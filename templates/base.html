@@ -3,6 +3,6 @@
 <title>{% block title %}Torneo Interfacultades{% endblock %} · UCU</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
 </head><body>
-<header class="topbar"><div class="shell"><a class="brand" href="{{ url_for('listar_equipos') }}"><span class="brand-mark">⚽</span><span>Torneo Interfacultades<small>Gestión · Fútbol 5</small></span></a><nav><a href="{{ url_for('listar_equipos') }}">Equipos</a><a href="{{ url_for('jugadores.lista') }}">Jugadores</a></nav></div></header>
+<header class="topbar"><div class="shell"><a class="brand" href="{{ url_for('listar_equipos') }}"><span class="brand-mark">⚽</span><span>Torneo Interfacultades<small>Gestión · Fútbol 5</small></span></a><nav><a href="{{ url_for('listar_equipos') }}">Equipos</a><a href="{{ url_for('jugadores.lista') }}">Jugadores</a><a href="{{ url_for('partidos.lista') }}">Partidos</a></nav></div></header>
 <main class="shell main">{% for mensaje in get_flashed_messages() %}<div class="flash" role="status">{{ mensaje }}</div>{% endfor %}{% block content %}{% endblock %}</main>
 </body></html>

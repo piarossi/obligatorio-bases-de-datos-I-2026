@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% block title %}Partidos{% endblock %}
+{% block content %}
+<div class="heading"><div><p class="eyebrow">Fixture</p><h1>Partidos</h1><p class="sub">Programación de encuentros del torneo.</p></div><a class="btn" href="{{ url_for('partidos.nuevo') }}">+ Programar partido</a></div>
+<div class="card table-wrap"><table><thead><tr><th>Fecha</th><th>Día / hora</th><th>Encuentro</th><th>Cancha</th><th>Estado</th><th>Acción</th></tr></thead><tbody>
+{% for p in partidos %}<tr><td>{{ p.numero_fecha }}</td><td>{{ p.dia }} · {{ p.hora_inicio }}</td><td><strong>{{ p.local }}</strong> vs. {{ p.visitante }}</td><td>{{ p.complejo }} · {{ p.nombre_cancha }}</td><td><span class="pill">{{ p.estado }}</span></td><td>{% if p.estado in ['programado','postergado'] %}<form method="post" action="{{ url_for('partidos.cancelar',id_partido=p.id_partido) }}" onsubmit="return confirm('¿Cancelar este partido?')"><input type="hidden" name="_csrf" value="{{ partidos_csrf() }}"><button class="btn danger small" type="submit">Cancelar</button></form>{% else %}—{% endif %}</td></tr>
+{% else %}<tr><td colspan="6" class="empty">Todavía no hay partidos programados.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}
