@@ -3,3 +3,8 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# Instaladores y respaldos temporales
+10_gestion_planteles/
+11_partidos/
+*.bak_*
