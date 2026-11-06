@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Eventos del partido{% endblock %}
+{% block content %}
+<div class="heading"><div><p class="eyebrow">Registro del encuentro</p><h1>Goles y tarjetas</h1>
+<p class="sub">{{ p.nombre_local }} vs. {{ p.nombre_visitante }} · Fecha {{ p.numero_fecha }}</p></div>
+<a class="btn" href="{{ url_for('partidos.lista') }}">Volver a partidos</a></div>
+<div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
+<h2>{{ p.nombre_local }} {{ local_goles }} — {{ visitante_goles }} {{ p.nombre_visitante }}</h2>
+<p>Estado: <strong>{{ p.estado }}</strong> · Fin del turno: {{ fin }}</p>
+<p>El marcador se calcula a partir de los goles. Los autogoles suman para el equipo contrario.</p>
+{% if not editable %}<p><strong>Solo lectura:</strong> el encuentro aún no terminó, está cancelado/postergado, la edición finalizó o pasó el plazo de corrección.</p>{% endif %}
+<p><a href="{{ url_for('planillas.editar',id_partido=p.id_partido) }}">Ver / editar participantes de la planilla</a></p>
+</div>
+{% if editable %}
+<div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
+<h2>Registrar gol</h2>
+<form method="post">
+<input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="gol">
+<label>Jugador de la planilla <select name="ci_jugador" required><option value="">Seleccionar</option>
+{% for j in jugadores %}<option value="{{ j.ci_jugador }}">{{ j.nombre }} {{ j.apellido }} · #{{ j.numero_camiseta }}</option>{% endfor %}
+</select></label>
+<label>Minuto <input type="number" name="minuto" min="0" max="60" required></label>
+<label><input type="checkbox" name="autogol" value="1"> Autogol (se suma al rival)</label>
+<button class="btn" type="submit">Guardar gol</button></form>
+</div>
+<div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
+<h2>Registrar tarjeta</h2>
+<form method="post">
+<input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="tarjeta">
+<label>Jugador de la planilla <select name="ci_jugador" required><option value="">Seleccionar</option>
+{% for j in jugadores %}<option value="{{ j.ci_jugador }}">{{ j.nombre }} {{ j.apellido }} · #{{ j.numero_camiseta }}</option>{% endfor %}
+</select></label>
+<label>Minuto <input type="number" name="minuto" min="0" max="60" required></label>
+<label>Color <select name="color" required><option value="amarilla">Amarilla</option><option value="roja">Roja</option></select></label>
+<button class="btn" type="submit">Guardar tarjeta</button></form>
+</div>
+{% endif %}
+<div class="card" style="padding:1.5rem;margin-bottom:1.5rem"><h2>Goles registrados</h2>
+<div class="table-wrap"><table><thead><tr><th>Minuto</th><th>Jugador</th><th>Tipo</th><th>Acción</th></tr></thead><tbody>
+{% for g in goles %}<tr><td>{{ g.minuto }}'</td><td>{{ g.nombre }} {{ g.apellido }}</td><td>{{ 'Autogol' if g.autogol else 'Gol' }}</td><td>{% if editable %}<form method="post"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="quitar_gol"><input type="hidden" name="id_evento" value="{{ g.id_gol }}"><button class="btn small danger" type="submit">Quitar</button></form>{% else %}—{% endif %}</td></tr>
+{% else %}<tr><td colspan="4">Sin goles registrados.</td></tr>{% endfor %}
+</tbody></table></div></div>
+<div class="card" style="padding:1.5rem;margin-bottom:1.5rem"><h2>Tarjetas registradas</h2>
+<div class="table-wrap"><table><thead><tr><th>Minuto</th><th>Jugador</th><th>Color</th><th>Acción</th></tr></thead><tbody>
+{% for t in tarjetas %}<tr><td>{{ t.minuto }}'</td><td>{{ t.nombre }} {{ t.apellido }}</td><td>{{ t.color }}</td><td>{% if editable %}<form method="post"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="quitar_tarjeta"><input type="hidden" name="id_evento" value="{{ t.id_tarjeta }}"><button class="btn small danger" type="submit">Quitar</button></form>{% else %}—{% endif %}</td></tr>
+{% else %}<tr><td colspan="4">Sin tarjetas registradas.</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% if editable and p.estado == 'programado' %}
+<div class="card" style="padding:1.5rem;margin-bottom:1.5rem"><h2>Cerrar encuentro</h2>
+<p>Antes de finalizar, verificá participantes, goles y tarjetas. Es posible corregir resultados durante las 48 horas posteriores al turno.</p>
+<form method="post"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="finalizar"><button class="btn" type="submit">Marcar como jugado</button></form></div>
+{% endif %}
+{% endblock %}

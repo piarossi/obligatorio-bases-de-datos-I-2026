@@ -23,6 +23,7 @@ CREATE TABLE jugador (
   fecha_nacimiento DATE NOT NULL,
   id_facultad INT NOT NULL,
   tipo ENUM('grado','posgrado','docente','funcionario') NOT NULL,
+  activo BOOLEAN NOT NULL DEFAULT TRUE,
   CONSTRAINT fk_jugador_facultad FOREIGN KEY (id_facultad) REFERENCES facultad(id_facultad)
 );
 
@@ -45,6 +46,7 @@ CREATE TABLE equipo (
   id_torneo INT NOT NULL,
   id_facultad INT NOT NULL,
   ci_capitan VARCHAR(20) NULL,
+  activo BOOLEAN NOT NULL DEFAULT TRUE,
   CONSTRAINT fk_equipo_torneo FOREIGN KEY (id_torneo) REFERENCES torneo(id_torneo),
   CONSTRAINT fk_equipo_facultad FOREIGN KEY (id_facultad) REFERENCES facultad(id_facultad),
   CONSTRAINT fk_equipo_capitan FOREIGN KEY (ci_capitan) REFERENCES jugador(ci),
@@ -148,6 +150,7 @@ CREATE TABLE tarjeta (
   ci_jugador VARCHAR(20) NOT NULL,
   minuto TINYINT UNSIGNED NOT NULL,
   color ENUM('amarilla','roja') NOT NULL,
+  origen ENUM('manual','doble_amarilla') NOT NULL DEFAULT 'manual',
   CONSTRAINT fk_tarjeta_planilla FOREIGN KEY (id_partido,ci_jugador)
     REFERENCES planilla_partido(id_partido,ci_jugador),
   CONSTRAINT chk_tarjeta_minuto CHECK (minuto BETWEEN 0 AND 60)
@@ -166,5 +169,5 @@ CREATE TABLE sancion_jugador (
   CONSTRAINT chk_sancion_duracion CHECK (cantidad_fechas > 0)
 );
 
--- Verificación
+-- Verificación: deben aparecer 14 tablas.
 SHOW TABLES;

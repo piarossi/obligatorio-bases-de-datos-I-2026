@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Reprogramar partido{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('gestion_partidos.lista') }}">← Volver a gestión de partidos</a>
+<div class="heading"><div><p class="eyebrow">Fixture</p><h1>Reprogramar partido #{{ p.id_partido }}</h1><p class="sub">{{ local }} vs. {{ visitante }} · Fecha {{ p.numero_fecha }}</p></div></div>
+{% with messages = get_flashed_messages() %}{% if messages %}<div class="card card-pad">{% for mensaje in messages %}<p>{{ mensaje }}</p>{% endfor %}</div>{% endif %}{% endwith %}
+<div class="card card-pad"><form method="post"><input type="hidden" name="_csrf" value="{{ csrf }}">
+<div class="form-grid">
+<div class="field"><label>Nuevo día</label><input type="date" name="dia" required value="{{ request.form.get('dia', p.dia) }}"></div>
+<div class="field"><label>Turno</label><select name="id_turno" required>{% for t in turnos %}<option value="{{ t.id_turno }}" {% if request.form.get('id_turno', p.id_turno|string) == t.id_turno|string %}selected{% endif %}>{{ t.hora_inicio }}–{{ t.hora_fin }}</option>{% endfor %}</select></div>
+<div class="field"><label>Complejo</label><select name="id_complejo" required>{% for c in canchas|unique(attribute='id_complejo') %}<option value="{{ c.id_complejo }}" {% if request.form.get('id_complejo', p.id_complejo|string) == c.id_complejo|string %}selected{% endif %}>{{ c.complejo }}</option>{% endfor %}</select></div>
+<div class="field"><label>Cancha</label><select name="nombre_cancha" required>{% for c in canchas %}<option value="{{ c.nombre_cancha }}" {% if request.form.get('nombre_cancha', p.nombre_cancha) == c.nombre_cancha %}selected{% endif %}>{{ c.complejo }} · {{ c.nombre_cancha }}</option>{% endfor %}</select></div>
+</div>
+<p class="muted-note">Seleccioná una cancha del complejo elegido. MySQL verificará que exista y el módulo evitará choques de horario, rivales repetidos y conflictos por fecha.</p>
+<button class="btn" type="submit">Guardar nueva programación</button></form></div>
+{% endblock %}

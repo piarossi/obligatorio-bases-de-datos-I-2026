@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Planilla del partido{% endblock %}
+{% block content %}
+<div class="heading"><div><p class="eyebrow">Registro de partido</p><h1>Planilla de participantes</h1>
+<p class="sub">{{ p.local }} vs. {{ p.visitante }} · Fecha {{ p.numero_fecha }}</p></div>
+<a class="btn" href="{{ url_for('partidos.lista') }}">Volver a partidos</a></div>
+<div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
+<p><strong>Fin del turno:</strong> {{ hora_fin }} · <strong>Estado:</strong> {{ p.estado }}</p>
+{% if not editable %}<p><strong>Solo lectura.</strong> El registro se habilita al terminar el turno; los partidos jugados solo admiten correcciones durante 48 horas. No pueden modificarse partidos cancelados, postergados o de torneos finalizados.</p>{% else %}
+<p>Marcá únicamente a los jugadores que participaron. Los inactivos y suspendidos no se pueden seleccionar.</p>{% endif %}</div>
+<form method="post" class="card" style="padding:1.5rem">
+<input type="hidden" name="_csrf" value="{{ csrf }}">
+{% for equipo_id,nombre in [(p.id_equipo_local,p.local),(p.id_equipo_visitante,p.visitante)] %}
+<h2>{{ nombre }}</h2>
+<div class="table-wrap"><table><thead><tr><th>Participó</th><th>Camiseta</th><th>Jugador</th><th>Condición</th></tr></thead><tbody>
+{% for j in jugadores if j.id_equipo == equipo_id %}
+<tr><td><input type="checkbox" name="ci_jugador" value="{{ j.ci }}" {% if j.ci in actuales %}checked{% endif %}
+{% if not editable or not j.activo or j.suspendido %}disabled{% endif %}></td>
+<td>#{{ j.numero_camiseta }}</td><td>{{ j.nombre }} {{ j.apellido }}</td>
+<td>{% if j.suspendido %}Suspendido{% elif not j.activo %}Inactivo{% else %}Habilitado{% endif %}</td></tr>
+{% endfor %}
+</tbody></table></div>
+{% endfor %}
+{% if editable %}<button class="btn" type="submit">Guardar participantes</button>{% endif %}
+</form>
+{% endblock %}

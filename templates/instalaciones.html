@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Complejos y canchas - Torneo UCU</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+<style>
+body{background:#f5f7f9;color:#24344a;font-family:system-ui,Arial,sans-serif}main{max-width:1100px;margin:35px auto;padding:0 20px}
+section{background:white;padding:20px;border-radius:12px;border:1px solid #d9e1e8;margin:18px 0;overflow-x:auto}
+input,select{padding:8px;border:1px solid #bbc8d0;border-radius:6px;max-width:100%}button{background:#155f58;color:white;border:0;padding:9px 12px;border-radius:7px;cursor:pointer}
+.danger{background:#a63f3f}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.grid label{display:grid;gap:5px}
+table{border-collapse:collapse;width:100%;min-width:720px}td,th{border-bottom:1px solid #e6eaee;padding:9px;text-align:left}th{background:#f4f6f8}form.inline{display:flex;gap:7px;flex-wrap:wrap;align-items:center}small{color:#68788a}
+</style></head><body><main>
+<h1>Complejos deportivos y canchas</h1><p><a href="{{ url_for('listar_equipos') }}">Volver a equipos</a> · Administración</p>
+{% for mensaje in get_flashed_messages() %}<section role="alert">{{ mensaje }}</section>{% endfor %}
+<section><h2>Nuevo complejo</h2>
+<form method="post" class="grid"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="crear_complejo">
+<label>Nombre<input name="nombre" maxlength="100" required></label>
+<label>Dirección<input name="direccion" maxlength="200" required></label>
+<label>Departamento<input name="departamento" maxlength="100" required></label>
+<div style="align-self:end"><button>Agregar complejo</button></div></form></section>
+<section><h2>Complejos</h2><table><thead><tr><th>ID</th><th>Datos</th><th>Canchas</th><th>Acciones</th></tr></thead><tbody>
+{% for c in complejos %}<tr><td>{{ c.id_complejo }}</td><td>
+<form method="post" class="inline"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="editar_complejo"><input type="hidden" name="id_complejo" value="{{ c.id_complejo }}">
+<input name="nombre" value="{{ c.nombre }}" maxlength="100" required aria-label="Nombre"><input name="direccion" value="{{ c.direccion }}" maxlength="200" required aria-label="Dirección"><input name="departamento" value="{{ c.departamento }}" maxlength="100" required aria-label="Departamento"><button>Guardar</button></form></td>
+<td>{{ c.cantidad_canchas }}</td><td><form method="post"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="eliminar_complejo"><input type="hidden" name="id_complejo" value="{{ c.id_complejo }}"><button class="danger">Eliminar</button></form></td></tr>{% endfor %}
+</tbody></table><small>No se eliminan complejos que todavía tienen canchas.</small></section>
+<section><h2>Nueva cancha</h2><form method="post" class="grid"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="crear_cancha">
+<label>Complejo<select name="id_complejo" required>{% for c in complejos %}<option value="{{ c.id_complejo }}">{{ c.nombre }}</option>{% endfor %}</select></label>
+<label>Nombre de la cancha<input name="nombre_cancha" maxlength="100" required></label>
+<label>Superficie<select name="superficie"><option value="sintético">Sintético</option><option value="parquet">Parquet</option></select></label>
+<label>Techada<select name="techada"><option value="0">No</option><option value="1">Sí</option></select></label>
+<div style="align-self:end"><button>Agregar cancha</button></div></form></section>
+<section><h2>Canchas</h2><table><thead><tr><th>Complejo y cancha</th><th>Propiedades</th><th>Partidos</th><th>Acciones</th></tr></thead><tbody>
+{% for c in canchas %}<tr><td>{{ c.complejo }}<br><strong>{{ c.nombre_cancha }}</strong></td><td>
+<form method="post" class="inline"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="editar_cancha"><input type="hidden" name="id_complejo" value="{{ c.id_complejo }}"><input type="hidden" name="nombre_cancha" value="{{ c.nombre_cancha }}">
+<select name="superficie"><option value="sintético" {% if c.superficie == 'sintético' %}selected{% endif %}>Sintético</option><option value="parquet" {% if c.superficie == 'parquet' %}selected{% endif %}>Parquet</option></select>
+<select name="techada"><option value="0" {% if not c.techada %}selected{% endif %}>No techada</option><option value="1" {% if c.techada %}selected{% endif %}>Techada</option></select><button>Guardar</button></form></td>
+<td>{{ c.partidos_asociados }}</td><td><form method="post"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="eliminar_cancha"><input type="hidden" name="id_complejo" value="{{ c.id_complejo }}"><input type="hidden" name="nombre_cancha" value="{{ c.nombre_cancha }}"><button class="danger">Eliminar</button></form></td></tr>{% endfor %}
+</tbody></table><small>Por seguridad, la clave (complejo, nombre de cancha) no se edita. No se pueden eliminar canchas utilizadas en partidos.</small></section>
+</main></body></html>

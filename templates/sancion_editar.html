@@ -1,0 +1,30 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Editar sanción</title><link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}"><style>
+body{font-family:system-ui,Arial,sans-serif;background:#f4f6fa;color:#1b2940;margin:0}
+main{max-width:1050px;margin:45px auto;padding:0 20px}
+header{display:flex;justify-content:space-between;align-items:center;gap:20px}
+a{color:#115b57}section{background:white;border:1px solid #d9e3ec;border-radius:16px;padding:24px;margin:22px 0}
+form.campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:14px}
+label{display:block;font-size:14px;font-weight:650;margin-bottom:5px}
+input,select{width:100%;box-sizing:border-box;font:inherit;border:1px solid #becbd5;padding:10px;border-radius:8px}
+button,.boton{border:0;background:#115b57;color:#fff;cursor:pointer;border-radius:8px;padding:11px 15px;font:inherit;text-decoration:none}
+button.danger{background:#a83c35}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #e2e8ee}
+th{background:#f4f6f8}small,.nota{color:#64748b}ul{padding-left:20px}
+.acciones{display:flex;gap:9px;align-items:center}.acciones form{margin:0}
+@media(max-width:650px){section{overflow:auto}.acciones{flex-wrap:wrap}}
+</style></head>
+<body><main><header><h1>Editar sanción disciplinaria #{{sancion.id_sancion}}</h1>
+<a href="{{url_for('sanciones_disciplinarias.lista')}}">Volver</a></header>
+{% for mensaje in get_flashed_messages() %}<section role="alert">{{mensaje}}</section>{% endfor %}
+<section><form method="post" class="campos"><input type="hidden" name="_csrf" value="{{csrf}}">
+<div><label>Edición</label><select name="id_torneo">
+{% for t in torneos %}<option value="{{t.id_torneo}}" {{'selected' if t.id_torneo==sancion.id_torneo else ''}}>{{t.nombre}} ({{t.anio}} S{{t.semestre}})</option>{% endfor %}
+</select></div>
+<div><label>Jugador</label><select name="ci_jugador">
+{% for j in jugadores %}<option value="{{j.ci}}" {{'selected' if j.ci==sancion.ci_jugador and j.id_torneo==sancion.id_torneo else ''}}>{{j.nombre}} {{j.apellido}} · {{j.ci}} · {{j.equipo}} (edición {{j.id_torneo}})</option>{% endfor %}
+</select></div>
+<div><label>Fecha desde</label><input type="number" min="1" name="numero_fecha_inicio" value="{{sancion.numero_fecha_inicio}}" required></div>
+<div><label>Cantidad de fechas</label><input type="number" min="1" max="30" name="cantidad_fechas" value="{{sancion.cantidad_fechas}}" required></div>
+<div style="align-self:end"><button type="submit">Guardar cambios</button></div>
+</form></section></main></body></html>

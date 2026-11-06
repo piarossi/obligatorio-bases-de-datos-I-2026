@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Gestión de partidos{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('partidos.lista') }}">← Volver al fixture</a>
+<div class="heading"><div><p class="eyebrow">Administración</p><h1>Estados de partidos</h1><p class="sub">Postergar, cancelar o reprogramar. Los partidos jugados se conservan.</p></div></div>
+{% with messages = get_flashed_messages() %}{% if messages %}<div class="card card-pad">{% for mensaje in messages %}<p>{{ mensaje }}</p>{% endfor %}</div>{% endif %}{% endwith %}
+<div class="card table-wrap"><table>
+<thead><tr><th>ID / fecha</th><th>Partido</th><th>Día y hora</th><th>Cancha</th><th>Estado</th><th>Acciones</th></tr></thead>
+<tbody>{% for p in partidos %}<tr>
+<td>#{{ p.id_partido }} · Fecha {{ p.numero_fecha }}</td>
+<td>{{ p.local }} vs. {{ p.visitante }}</td>
+<td>{{ p.dia }} · {{ p.hora_inicio }}</td>
+<td>{{ p.complejo }} · {{ p.nombre_cancha }}</td>
+<td><span class="pill">{{ p.estado }}</span></td>
+<td style="min-width:180px">
+{% if p.estado in ['programado','postergado'] %}
+<a href="{{ url_for('gestion_partidos.reprogramar', id_partido=p.id_partido) }}">Reprogramar</a>
+{% endif %}
+{% if p.estado == 'programado' %}
+<form method="post" action="{{ url_for('gestion_partidos.cambiar_estado', id_partido=p.id_partido) }}" style="display:inline-block; margin:5px 3px 0 0">
+<input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="postergar">
+<button class="btn small" type="submit">Postergar</button></form>
+{% endif %}
+{% if p.estado in ['programado','postergado'] %}
+<form method="post" action="{{ url_for('gestion_partidos.cambiar_estado', id_partido=p.id_partido) }}" style="display:inline-block; margin:5px 3px 0 0">
+<input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="cancelar">
+<button class="btn danger small" type="submit">Cancelar</button></form>
+{% endif %}
+{% if p.estado in ['jugado','cancelado'] %}—{% endif %}
+</td>
+</tr>{% else %}<tr><td colspan="6">No hay partidos.</td></tr>{% endfor %}</tbody></table></div>
+<p class="muted-note">Los cambios de estado conservan el registro. Reprogramar reserva un nuevo día y turno sin cambiar los equipos ni la fecha numerada del torneo.</p>
+{% endblock %}

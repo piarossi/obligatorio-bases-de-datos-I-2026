@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sanciones disciplinarias - Torneo UCU</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+<style>
+body{font-family:system-ui,Arial,sans-serif;background:#f4f6fa;color:#1b2940;margin:0}
+main{max-width:1050px;margin:45px auto;padding:0 20px}
+header{display:flex;justify-content:space-between;align-items:center;gap:20px}
+a{color:#115b57}section{background:white;border:1px solid #d9e3ec;border-radius:16px;padding:24px;margin:22px 0}
+form.campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:14px}
+label{display:block;font-size:14px;font-weight:650;margin-bottom:5px}
+input,select{width:100%;box-sizing:border-box;font:inherit;border:1px solid #becbd5;padding:10px;border-radius:8px}
+button,.boton{border:0;background:#115b57;color:#fff;cursor:pointer;border-radius:8px;padding:11px 15px;font:inherit;text-decoration:none}
+button.danger{background:#a83c35}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #e2e8ee}
+th{background:#f4f6f8}small,.nota{color:#64748b}ul{padding-left:20px}
+.acciones{display:flex;gap:9px;align-items:center}.acciones form{margin:0}
+@media(max-width:650px){section{overflow:auto}.acciones{flex-wrap:wrap}}
+</style></head>
+<body><main>
+<header><div><h1>Sanciones del torneo</h1><p class="nota">ABM de sanciones disciplinarias · Sólo administrador</p></div>
+<a href="{{ url_for('partidos.lista') }}">Volver a partidos</a></header>
+{% for mensaje in get_flashed_messages() %}<section role="alert">{{ mensaje }}</section>{% endfor %}
+<section><h2>Registrar sanción disciplinaria</h2>
+<p class="nota">Ejemplo: edición 2026 S2, fecha 4, duración 2: no juega las fechas 4 y 5.</p>
+<form method="post" class="campos">
+<input type="hidden" name="_csrf" value="{{ csrf }}">
+<div><label>Edición</label><select name="id_torneo" required>
+{% for t in torneos %}<option value="{{t.id_torneo}}">{{t.nombre}} ({{t.anio}} S{{t.semestre}})</option>{% endfor %}
+</select></div>
+<div><label>Jugador / equipo</label><select name="ci_jugador" required>
+<option value="">Seleccionar jugador</option>
+{% for j in jugadores %}<option value="{{j.ci}}">{{j.apellido}}, {{j.nombre}} ({{j.ci}}) · {{j.equipo}} · torneo {{j.id_torneo}}</option>{% endfor %}
+</select></div>
+<div><label>Fecha desde</label><input type="number" name="numero_fecha_inicio" min="1" value="4" required></div>
+<div><label>Cantidad de fechas</label><input type="number" name="cantidad_fechas" min="1" max="30" value="2" required></div>
+<div style="align-self:end"><button type="submit">Agregar sanción</button></div>
+</form></section>
+<section><h2>Historial de sanciones</h2>
+<p class="nota">Las sanciones automáticas se muestran aquí, pero no se pueden editar ni borrar desde este módulo.</p>
+<table><thead><tr><th>Jugador</th><th>Motivo</th><th>Desde fecha</th><th>Duración</th><th>Acciones</th></tr></thead>
+<tbody>{% for s in sanciones %}
+<tr><td>{{s.nombre}} {{s.apellido}}<br><small>{{s.ci_jugador}} · {{s.torneo}}</small></td>
+<td>{{s.motivo}}</td><td>{{s.numero_fecha_inicio}}</td><td>{{s.cantidad_fechas}}</td>
+<td>{% if s.motivo == 'disciplinaria' %}<div class="acciones">
+<a href="{{url_for('sanciones_disciplinarias.editar',id_sancion=s.id_sancion)}}">Editar</a>
+<form method="post" action="{{url_for('sanciones_disciplinarias.eliminar',id_sancion=s.id_sancion)}}">
+<input type="hidden" name="_csrf" value="{{csrf}}"><button class="danger" type="submit">Eliminar</button></form>
+</div>{% else %}<small>Automática</small>{% endif %}</td></tr>
+{% else %}<tr><td colspan="5">No hay sanciones registradas.</td></tr>{% endfor %}</tbody></table>
+</section></main></body></html>
