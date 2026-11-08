@@ -5,6 +5,8 @@ from pathlib import Path
 import mysql.connector
 from dotenv import load_dotenv
 from flask import Flask, render_template, abort, session, redirect, url_for, request, has_request_context
+from secrets import token_hex
+from hmac import compare_digest
 from mysql.connector import Error
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -157,18 +159,45 @@ from eventos import registrar_eventos
 app.register_blueprint(registrar_eventos(conectar))
 
 
-# ABM de sanciones disciplinarias (modulo 18).
+# ABM de sanciones disciplinarias.
 from sanciones_disciplinarias import registrar_sanciones
 app.register_blueprint(registrar_sanciones(conectar))
 
-# ABM de complejos y canchas (modulo 19).
+# ABM de complejos y canchas.
 from instalaciones import registrar_instalaciones
 app.register_blueprint(registrar_instalaciones(conectar))
 
 
-# Estado de partidos: módulo 20 (sin modificar partidos.py).
+# Administración de estados y reprogramaciones.
 from gestion_partidos import registrar_gestion_partidos
 app.register_blueprint(registrar_gestion_partidos(conectar))
+
+from reportes import registrar_reportes
+app.register_blueprint(registrar_reportes(conectar))
+
+
+@app.context_processor
+def token_csrf_global():
+    def csrf_general():
+        if 'csrf_general' not in session:
+            session['csrf_general'] = token_hex(24)
+        return session['csrf_general']
+    return {'csrf_general': csrf_general}
+
+
+@app.before_request
+def proteger_formularios_generales():
+    # Estos módulos se crearon sin token propio. Los demás ya lo validan internamente.
+    protegidos = {
+        'auth.login', 'auth.logout',
+        'jugadores.nuevo', 'jugadores.editar', 'jugadores.baja',
+        'equipos_abm.nuevo', 'equipos_abm.editar', 'equipos_abm.baja',
+    }
+    if request.method == 'POST' and request.endpoint in protegidos:
+        esperado = session.get('csrf_general')
+        recibido = request.form.get('_csrf', '')
+        if not esperado or not compare_digest(recibido, esperado):
+            abort(400, 'Formulario expirado o inválido. Actualizá la pantalla.')
 
 
 @app.before_request
@@ -185,7 +214,7 @@ def controlar_permisos():
     # Solo estas páginas pueden consultarse sin sesión. Nunca formularios de gestión.
     publicas = {
         'listar_equipos', 'ver_plantel', 'detalle_jugador',
-        'jugadores.lista', 'partidos.lista',
+        'jugadores.lista', 'partidos.lista', 'reportes.vista',
     }
     if request.method == 'GET' and endpoint in publicas:
         return None

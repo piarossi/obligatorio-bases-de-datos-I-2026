@@ -3,7 +3,7 @@
 {% block content %}
 <div class="heading"><div><p class="eyebrow">Gestión del torneo</p><h1>{{ titulo }}</h1><p class="sub">Solo se permite durante la etapa de inscripción.</p></div></div>
 <section class="card" style="padding:24px;max-width:680px">
-<form method="post">
+<form method="post"><input type="hidden" name="_csrf" value="{{ csrf_general() }}">
   <p><label for="nombre">Nombre del equipo</label><br><input id="nombre" name="nombre" maxlength="100" required style="width:100%;padding:10px" value="{{ equipo.nombre if equipo else '' }}"></p>
   <p><label for="id_torneo">Edición del torneo</label><br><select id="id_torneo" name="id_torneo" required style="width:100%;padding:10px" {% if not nuevo %}disabled{% endif %}>
     {% for t in torneos %}<option value="{{ t.id_torneo }}" {% if equipo and equipo.id_torneo|string == t.id_torneo|string %}selected{% endif %}>{{ t.nombre }} ({{ t.estado }})</option>{% endfor %}

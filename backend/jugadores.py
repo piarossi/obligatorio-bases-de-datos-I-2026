@@ -1,4 +1,4 @@
-"""ABM inicial de jugadores para uso LOCAL. Falta autenticación y CSRF."""
+"""ABM de jugadores. Autorización y CSRF se aplican en app.py."""
 from datetime import date
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from mysql.connector import IntegrityError

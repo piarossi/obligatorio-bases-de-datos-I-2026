@@ -18,7 +18,7 @@
 <header class="login-marca"><span class="logo">⚽</span><h1>Torneo Interfacultades</h1><p>UCU · Fútbol 5</p></header>
 <section class="login-tarjeta"><h2>Bienvenido</h2><p>Iniciá sesión para gestionar el torneo.</p>
 {% for mensaje in get_flashed_messages() %}<p class="login-error" role="alert">{{ mensaje }}</p>{% endfor %}
-<form method="POST">
+<form method="POST"><input type="hidden" name="_csrf" value="{{ csrf_general() }}">
 <label for="correo">Correo electrónico</label><input id="correo" name="correo" type="email" autocomplete="username" required>
 <label for="contrasena">Contraseña</label><input id="contrasena" name="contrasena" type="password" autocomplete="current-password" required>
 <button type="submit">Iniciar sesión</button>

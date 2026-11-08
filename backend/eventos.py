@@ -5,6 +5,7 @@ from secrets import token_hex
 from flask import Blueprint, abort, flash, redirect, render_template, request, session, url_for
 from mysql.connector import Error
 from sanciones import recalcular_sanciones
+from historial_partidos import registrar_historial
 
 bp = Blueprint('eventos', __name__)
 
@@ -160,6 +161,8 @@ def registrar_eventos(conectar):
                             if p['estado'] != 'programado':
                                 raise ValueError('El partido ya está marcado como jugado.')
                             cur.execute("UPDATE partido SET estado='jugado' WHERE id_partido=%s",(id_partido,))
+                            registrar_historial(cur, p, {**p, 'estado': 'jugado'}, 'jugado',
+                                                 motivo='Cierre de planilla y resultado')
                             flash('Partido marcado como jugado. Resultado calculado desde los goles.')
                         else:
                             raise ValueError('Acción desconocida.')

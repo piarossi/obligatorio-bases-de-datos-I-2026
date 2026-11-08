@@ -19,15 +19,45 @@
 {% if p.estado == 'programado' %}
 <form method="post" action="{{ url_for('gestion_partidos.cambiar_estado', id_partido=p.id_partido) }}" style="display:inline-block; margin:5px 3px 0 0">
 <input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="postergar">
-<button class="btn small" type="submit">Postergar</button></form>
+<input name="motivo" aria-label="Motivo de postergación" placeholder="Motivo de la postergación" minlength="5" maxlength="255" required style="width:190px;max-width:100%;padding:7px;border:1px solid #d7e1e7;border-radius:6px"><button class="btn small" type="submit">Postergar</button></form>
 {% endif %}
 {% if p.estado in ['programado','postergado'] %}
 <form method="post" action="{{ url_for('gestion_partidos.cambiar_estado', id_partido=p.id_partido) }}" style="display:inline-block; margin:5px 3px 0 0">
 <input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="cancelar">
-<button class="btn danger small" type="submit">Cancelar</button></form>
+<input name="motivo" aria-label="Motivo de cancelación" placeholder="Motivo de la cancelación" minlength="5" maxlength="255" required style="width:190px;max-width:100%;padding:7px;border:1px solid #d7e1e7;border-radius:6px"><button class="btn danger small" type="submit">Cancelar</button></form>
 {% endif %}
 {% if p.estado in ['jugado','cancelado'] %}—{% endif %}
 </td>
 </tr>{% else %}<tr><td colspan="6">No hay partidos.</td></tr>{% endfor %}</tbody></table></div>
 <p class="muted-note">Los cambios de estado conservan el registro. Reprogramar reserva un nuevo día y turno sin cambiar los equipos ni la fecha numerada del torneo.</p>
+
+<section class="card card-pad" style="margin-top:22px">
+  <h2>Historial reciente de cambios</h2>
+  <p class="sub">Registros generados desde que incorporamos el historial. Los cambios anteriores no pueden reconstruirse automáticamente.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Cuándo</th><th>Partido</th><th>Acción</th><th>Estado anterior</th><th>Estado nuevo</th><th>Día anterior</th><th>Día nuevo</th><th>Usuario</th><th>Motivo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for h in historial %}
+        <tr>
+          <td>{{ h.fecha_cambio }}</td>
+          <td>#{{ h.id_partido }}</td>
+          <td>{{ h.accion }}</td>
+          <td>{{ h.estado_anterior or '—' }}</td>
+          <td>{{ h.estado_nuevo }}</td>
+          <td>{{ h.dia_anterior or '—' }}</td>
+          <td>{{ h.dia_nuevo }}</td>
+          <td>{{ h.correo_usuario or 'No indicado' }}</td><td>{{ h.motivo or '—' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9">Todavía no hay cambios registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
 {% endblock %}

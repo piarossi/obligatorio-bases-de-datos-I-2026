@@ -2,6 +2,7 @@
 from datetime import date
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, session
 from mysql.connector import Error
+from historial_partidos import registrar_historial
 from secrets import token_hex
 from hmac import compare_digest
 
@@ -126,6 +127,10 @@ def registrar_partidos(conectar):
                            (id_torneo,numero_fecha,id_equipo_local,id_equipo_visitante,
                            dia,id_turno,nombre_cancha,id_complejo,estado)
                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'programado')''',datos)
+                        nuevo = {'id_partido': cur.lastrowid, 'estado': 'programado',
+                                 'dia': datos[4], 'id_turno': datos[5],
+                                 'nombre_cancha': datos[6], 'id_complejo': datos[7]}
+                        registrar_historial(cur, None, nuevo, 'creado', motivo='Alta inicial del partido')
                         cn.commit()
                         flash('Partido programado correctamente.')
                         return redirect(url_for('partidos.lista'))
@@ -145,7 +150,7 @@ def registrar_partidos(conectar):
         try:
             cur=cn.cursor(dictionary=True)
             try:
-                cur.execute('''SELECT p.estado,t.estado AS torneo_estado FROM partido p
+                cur.execute('''SELECT p.*,t.estado AS torneo_estado FROM partido p
                                JOIN torneo t ON t.id_torneo=p.id_torneo
                                WHERE id_partido=%s FOR UPDATE''',(id_partido,))
                 p=cur.fetchone()
@@ -153,7 +158,14 @@ def registrar_partidos(conectar):
                 if p['estado'] not in ('programado','postergado') or p['torneo_estado']=='finalizado':
                     flash('Solo se puede cancelar un partido pendiente de una edición no finalizada.')
                 else:
+                    cur.execute('SELECT 1 FROM planilla_partido WHERE id_partido=%s LIMIT 1', (id_partido,))
+                    if cur.fetchone():
+                        cn.rollback()
+                        flash('No se cancela un encuentro que ya tiene participantes registrados.')
+                        return redirect(url_for('partidos.lista'))
                     cur.execute("UPDATE partido SET estado='cancelado' WHERE id_partido=%s",(id_partido,))
+                    registrar_historial(cur, p, {**p, 'estado':'cancelado'}, 'cancelado',
+                                        motivo='Cancelación desde el listado de partidos')
                     cn.commit()
                     flash('Partido cancelado; se conserva su historial.')
             except Error:

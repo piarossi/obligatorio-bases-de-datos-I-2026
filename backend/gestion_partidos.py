@@ -5,6 +5,7 @@ from secrets import token_hex
 
 from flask import Blueprint, abort, flash, redirect, render_template, request, session, url_for
 from mysql.connector import Error
+from historial_partidos import registrar_historial
 
 
 def registrar_gestion_partidos(conectar):
@@ -120,18 +121,29 @@ def registrar_gestion_partidos(conectar):
                                JOIN turno tu ON tu.id_turno=p.id_turno
                                ORDER BY p.numero_fecha,p.dia,p.id_partido''')
                 partidos = cur.fetchall()
+                cur.execute('''SELECT h.id_historial,h.id_partido,h.accion,h.fecha_cambio,
+                                      h.estado_anterior,h.estado_nuevo,
+                                      h.dia_anterior,h.dia_nuevo,
+                                      h.correo_usuario,h.motivo
+                               FROM historial_estado_partido h
+                               ORDER BY h.id_historial DESC LIMIT 40''')
+                historial = cur.fetchall()
             finally:
                 cur.close()
         finally:
             cn.close()
-        return render_template('gestion_partidos.html', partidos=partidos, csrf=token())
+        return render_template('gestion_partidos.html', partidos=partidos, historial=historial, csrf=token())
 
     @bp.post('/<int:id_partido>/estado')
     def cambiar_estado(id_partido):
         validar_token()
         accion = request.form.get('accion')
+        motivo = request.form.get('motivo', '').strip()
         if accion not in ('postergar', 'cancelar'):
             abort(400)
+        if not 5 <= len(motivo) <= 255:
+            flash('Indicá el motivo del cambio (entre 5 y 255 caracteres).')
+            return redirect(url_for('gestion_partidos.lista'))
         cn = conectar()
         try:
             cur = cn.cursor(dictionary=True, buffered=True)
@@ -150,8 +162,12 @@ def registrar_gestion_partidos(conectar):
                     if (accion == 'postergar' and p['estado'] != 'programado') or (accion == 'cancelar' and p['estado'] not in ('programado', 'postergado')):
                         raise ValueError('La operación no está permitida para el estado actual.')
                     sin_eventos(cur, id_partido)
+                    estado_nuevo = 'postergado' if accion == 'postergar' else 'cancelado'
                     cur.execute('UPDATE partido SET estado=%s WHERE id_partido=%s',
-                                ('postergado' if accion == 'postergar' else 'cancelado', id_partido))
+                                (estado_nuevo, id_partido))
+                    registrar_historial(cur, p, {**p, 'estado': estado_nuevo},
+                                       'postergado' if accion == 'postergar' else 'cancelado',
+                                       motivo=motivo)
                     cn.commit()
                     flash('Partido ' + ('postergado' if accion == 'postergar' else 'cancelado') + ' correctamente.')
                 except ValueError as exc:
@@ -197,11 +213,18 @@ def registrar_gestion_partidos(conectar):
                         if not torneo['fecha_inicio'] <= dia <= torneo['fecha_fin']:
                             raise ValueError('El día debe estar comprendido en el período de la edición.')
                         comprobar_programacion(cur, p, dia, turno, complejo, cancha)
+                        motivo = request.form.get('motivo', '').strip()
+                        if not 5 <= len(motivo) <= 255:
+                            raise ValueError('Indicá el motivo de la reprogramación (5 a 255 caracteres).')
                         cur.execute('''UPDATE partido
                                        SET dia=%s, id_turno=%s, id_complejo=%s,
                                            nombre_cancha=%s, estado='programado'
                                        WHERE id_partido=%s''',
                                     (dia, turno, complejo, cancha, id_partido))
+                        registrar_historial(cur, p,
+                            {**p, 'dia': dia, 'id_turno': turno, 'id_complejo': complejo,
+                             'nombre_cancha': cancha, 'estado': 'programado'},
+                            'reprogramado', motivo=motivo)
                         cn.commit()
                         flash('Partido reprogramado correctamente.')
                         return redirect(url_for('gestion_partidos.lista'))

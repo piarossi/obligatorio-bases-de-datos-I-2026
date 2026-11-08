@@ -1,4 +1,4 @@
-"""Alta, modificación y baja lógica de equipos (solo uso local, aún sin login/CSRF)."""
+"""ABM de equipos: el acceso y CSRF se controlan desde app.py."""
 from flask import Blueprint, request, render_template, redirect, url_for, flash, abort
 from mysql.connector import IntegrityError, Error
 

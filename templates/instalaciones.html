@@ -1,16 +1,29 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Complejos y canchas - Torneo UCU</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+{% extends 'base.html' %}
+{% block title %}Instalaciones{% endblock %}
+{% block content %}
 <style>
-body{background:#f5f7f9;color:#24344a;font-family:system-ui,Arial,sans-serif}main{max-width:1100px;margin:35px auto;padding:0 20px}
-section{background:white;padding:20px;border-radius:12px;border:1px solid #d9e1e8;margin:18px 0;overflow-x:auto}
-input,select{padding:8px;border:1px solid #bbc8d0;border-radius:6px;max-width:100%}button{background:#155f58;color:white;border:0;padding:9px 12px;border-radius:7px;cursor:pointer}
-.danger{background:#a63f3f}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.grid label{display:grid;gap:5px}
-table{border-collapse:collapse;width:100%;min-width:720px}td,th{border-bottom:1px solid #e6eaee;padding:9px;text-align:left}th{background:#f4f6f8}form.inline{display:flex;gap:7px;flex-wrap:wrap;align-items:center}small{color:#68788a}
-</style></head><body><main>
-<h1>Complejos deportivos y canchas</h1><p><a href="{{ url_for('listar_equipos') }}">Volver a equipos</a> · Administración</p>
-{% for mensaje in get_flashed_messages() %}<section role="alert">{{ mensaje }}</section>{% endfor %}
+.module-page section{background:white;padding:22px;border-radius:13px;border:1px solid #d9e1e8;margin:18px 0;overflow-x:auto}
+.module-page input,.module-page select{padding:9px;border:1px solid #bbc8d0;border-radius:7px;max-width:100%;font:inherit}
+.module-page button{background:#155f58;color:white;border:0;padding:9px 12px;border-radius:7px;cursor:pointer;font:inherit}
+.module-page button.danger{background:#a63f3f}
+.module-page .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.module-page .grid label{display:grid;gap:5px}
+.module-page form.campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:14px}
+.module-page table{min-width:650px}
+.module-page th,.module-page td{padding:11px;text-align:left}
+.module-page form.inline{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.module-page small,.module-page .nota{color:#68788a}
+.module-page .acciones{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.module-page .acciones form{margin:0}
+.module-page .mod-header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.module-page label{display:block;font-size:14px;font-weight:650;margin-bottom:5px}
+.module-page input,.module-page select{width:100%}
+.module-page .grid input,.module-page .grid select{width:100%}
+</style>
+<div class="module-page">
+
+<div class="heading"><div><p class="eyebrow">Administración</p><h1>Complejos deportivos y canchas</h1></div></div><p><a href="{{ url_for('listar_equipos') }}">Volver a equipos</a> · Administración</p>
+
 <section><h2>Nuevo complejo</h2>
 <form method="post" class="grid"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="crear_complejo">
 <label>Nombre<input name="nombre" maxlength="100" required></label>
@@ -36,4 +49,6 @@ table{border-collapse:collapse;width:100%;min-width:720px}td,th{border-bottom:1p
 <select name="techada"><option value="0" {% if not c.techada %}selected{% endif %}>No techada</option><option value="1" {% if c.techada %}selected{% endif %}>Techada</option></select><button>Guardar</button></form></td>
 <td>{{ c.partidos_asociados }}</td><td><form method="post"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="accion" value="eliminar_cancha"><input type="hidden" name="id_complejo" value="{{ c.id_complejo }}"><input type="hidden" name="nombre_cancha" value="{{ c.nombre_cancha }}"><button class="danger">Eliminar</button></form></td></tr>{% endfor %}
 </tbody></table><small>Por seguridad, la clave (complejo, nombre de cancha) no se edita. No se pueden eliminar canchas utilizadas en partidos.</small></section>
-</main></body></html>
+
+</div>
+{% endblock %}

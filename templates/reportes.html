@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Reportes SQL{% endblock %}
+{% block content %}
+<div class="heading"><div>
+  <p class="eyebrow">Consultas SQL</p><h1>Reportes del torneo</h1>
+  <p class="sub">Reportes obligatorios y consultas adicionales · edición 2026, semestre 2</p>
+</div></div>
+<form method="get" action="{{ url_for('reportes.vista') }}" class="report-toolbar">
+  <div><label for="reporte">Seleccioná un reporte</label><select id="reporte" name="reporte">
+  {% for titulo in titulos %}<option value="{{ loop.index0 }}" {% if loop.index0 == seleccionado %}selected{% endif %}>{{ titulo }}</option>{% endfor %}
+  </select></div><button class="btn" type="submit">Consultar</button>
+</form>
+<section class="card card-pad" style="margin-bottom:16px">
+  <strong>{{ titulos[seleccionado] }}</strong>
+  <p class="sub">Los datos se obtienen mediante SQL directamente de MySQL, sin ORM. El script íntegro está en <code>sql/05_reportes.sql</code>.</p>
+</section>
+{% if mensaje %}<div class="flash" role="alert">{{ mensaje }}</div>{% else %}
+<div class="card table-wrap"><table>
+<thead><tr>{% for c in columnas %}<th>{{ c.replace('_', ' ') }}</th>{% endfor %}</tr></thead>
+<tbody>{% for fila in filas %}<tr>{% for c in columnas %}<td>{{ fila[c] if fila[c] is not none else '—' }}</td>{% endfor %}</tr>
+{% else %}<tr><td colspan="{{ columnas|length or 1 }}" class="empty">Esta consulta no devolvió resultados con los datos actuales.</td></tr>{% endfor %}
+</tbody></table></div>
+<p class="muted-note">Resultados: {{ filas|length }} filas. Este apartado es de solo lectura.</p>
+{% endif %}
+{% endblock %}

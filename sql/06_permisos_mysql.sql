@@ -1,5 +1,13 @@
+-- INSTALACION NUEVA: ejecutar como administrador de MySQL DESPUES del esquema.
+-- No usar valores reales de contraseñas en el archivo versionado.
+-- Si el usuario torneo_app ya existe, CREATE USER IF NOT EXISTS NO le cambia su clave.
+CREATE USER IF NOT EXISTS 'torneo_app'@'localhost'
+IDENTIFIED BY 'REEMPLAZAR_CON_CLAVE_APP_MYSQL';
+GRANT SELECT, INSERT, UPDATE, DELETE ON torneo_interfacultades.*
+TO 'torneo_app'@'localhost';
+
 -- EJECUTAR DESDE DATAGRIP CON UN USUARIO MYSQL ADMINISTRADOR.
--- 1) Sustituir CAMBIAR_POR_CLAVE_LARGA_UNICA por una clave propia,
+-- 1) Sustituir REEMPLAZAR_CON_CLAVE_LARGA_UNICA por una clave propia,
 --    que coincida con DB_PLANILLERO_PASSWORD en .env.
 -- 2) Este SQL NO cambia ninguna tabla ni los datos de partidos.
 -- 3) El planillero solo puede leer la base, registrar/corregir
@@ -22,5 +30,6 @@ GRANT INSERT, DELETE ON torneo_interfacultades.gol TO 'torneo_planillero'@'local
 GRANT INSERT, DELETE ON torneo_interfacultades.tarjeta TO 'torneo_planillero'@'localhost';
 GRANT UPDATE (estado) ON torneo_interfacultades.partido TO 'torneo_planillero'@'localhost';
 GRANT INSERT, DELETE ON torneo_interfacultades.sancion_jugador TO 'torneo_planillero'@'localhost';
+GRANT INSERT ON torneo_interfacultades.historial_estado_partido TO 'torneo_planillero'@'localhost';
 
 SHOW GRANTS FOR 'torneo_planillero'@'localhost';

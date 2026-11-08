@@ -1,26 +1,30 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sanciones disciplinarias - Torneo UCU</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+{% extends 'base.html' %}
+{% block title %}Sanciones{% endblock %}
+{% block content %}
 <style>
-body{font-family:system-ui,Arial,sans-serif;background:#f4f6fa;color:#1b2940;margin:0}
-main{max-width:1050px;margin:45px auto;padding:0 20px}
-header{display:flex;justify-content:space-between;align-items:center;gap:20px}
-a{color:#115b57}section{background:white;border:1px solid #d9e3ec;border-radius:16px;padding:24px;margin:22px 0}
-form.campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:14px}
-label{display:block;font-size:14px;font-weight:650;margin-bottom:5px}
-input,select{width:100%;box-sizing:border-box;font:inherit;border:1px solid #becbd5;padding:10px;border-radius:8px}
-button,.boton{border:0;background:#115b57;color:#fff;cursor:pointer;border-radius:8px;padding:11px 15px;font:inherit;text-decoration:none}
-button.danger{background:#a83c35}
-table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #e2e8ee}
-th{background:#f4f6f8}small,.nota{color:#64748b}ul{padding-left:20px}
-.acciones{display:flex;gap:9px;align-items:center}.acciones form{margin:0}
-@media(max-width:650px){section{overflow:auto}.acciones{flex-wrap:wrap}}
-</style></head>
-<body><main>
-<header><div><h1>Sanciones del torneo</h1><p class="nota">ABM de sanciones disciplinarias · Sólo administrador</p></div>
-<a href="{{ url_for('partidos.lista') }}">Volver a partidos</a></header>
-{% for mensaje in get_flashed_messages() %}<section role="alert">{{ mensaje }}</section>{% endfor %}
+.module-page section{background:white;padding:22px;border-radius:13px;border:1px solid #d9e1e8;margin:18px 0;overflow-x:auto}
+.module-page input,.module-page select{padding:9px;border:1px solid #bbc8d0;border-radius:7px;max-width:100%;font:inherit}
+.module-page button{background:#155f58;color:white;border:0;padding:9px 12px;border-radius:7px;cursor:pointer;font:inherit}
+.module-page button.danger{background:#a63f3f}
+.module-page .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.module-page .grid label{display:grid;gap:5px}
+.module-page form.campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:14px}
+.module-page table{min-width:650px}
+.module-page th,.module-page td{padding:11px;text-align:left}
+.module-page form.inline{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.module-page small,.module-page .nota{color:#68788a}
+.module-page .acciones{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.module-page .acciones form{margin:0}
+.module-page .mod-header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.module-page label{display:block;font-size:14px;font-weight:650;margin-bottom:5px}
+.module-page input,.module-page select{width:100%}
+.module-page .grid input,.module-page .grid select{width:100%}
+</style>
+<div class="module-page">
+
+<div class="mod-header"><div><h1>Sanciones del torneo</h1><p class="nota">ABM de sanciones disciplinarias · Sólo administrador</p></div>
+<a href="{{ url_for('partidos.lista') }}">Volver a partidos</a></div>
+
 <section><h2>Registrar sanción disciplinaria</h2>
 <p class="nota">Ejemplo: edición 2026 S2, fecha 4, duración 2: no juega las fechas 4 y 5.</p>
 <form method="post" class="campos">
@@ -48,4 +52,6 @@ th{background:#f4f6f8}small,.nota{color:#64748b}ul{padding-left:20px}
 <input type="hidden" name="_csrf" value="{{csrf}}"><button class="danger" type="submit">Eliminar</button></form>
 </div>{% else %}<small>Automática</small>{% endif %}</td></tr>
 {% else %}<tr><td colspan="5">No hay sanciones registradas.</td></tr>{% endfor %}</tbody></table>
-</section></main></body></html>
+</section>
+</div>
+{% endblock %}

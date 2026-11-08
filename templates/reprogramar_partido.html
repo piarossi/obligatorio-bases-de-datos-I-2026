@@ -12,5 +12,5 @@
 <div class="field"><label>Cancha</label><select name="nombre_cancha" required>{% for c in canchas %}<option value="{{ c.nombre_cancha }}" {% if request.form.get('nombre_cancha', p.nombre_cancha) == c.nombre_cancha %}selected{% endif %}>{{ c.complejo }} · {{ c.nombre_cancha }}</option>{% endfor %}</select></div>
 </div>
 <p class="muted-note">Seleccioná una cancha del complejo elegido. MySQL verificará que exista y el módulo evitará choques de horario, rivales repetidos y conflictos por fecha.</p>
-<button class="btn" type="submit">Guardar nueva programación</button></form></div>
+<div class="field" style="margin-bottom:18px"><label for="motivo">Motivo de reprogramación</label><input id="motivo" name="motivo" minlength="5" maxlength="255" required placeholder="Ej.: lluvia o indisponibilidad de cancha" value="{{ request.form.get('motivo','') }}"></div><button class="btn" type="submit">Guardar nueva programación</button></form></div>
 {% endblock %}
