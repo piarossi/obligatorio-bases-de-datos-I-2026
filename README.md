@@ -1,6 +1,6 @@
 # Torneo Interfacultades de Fútbol 5 — Bases de Datos I (UCU)
 
-Aplicación web local en **Python + Flask + MySQL 8**, sin ORM. Incluye los 14 objetos relacionales requeridos y una **15.ª tabla de historial de cambios de partidos**, con reporte técnico en `docs/INFORME_FINAL_BD_I.docx`.
+Aplicación web local en **Python + Flask + MySQL 8**, sin ORM. Incluye los 14 objetos relacionales requeridos y una **15.ª tabla de historial de cambios de partidos**, con reporte técnico en `docs/Informe_BD1_2026_bitacora_narrativa.docx`.
 
 ## 1. Qué incluye
 
@@ -96,8 +96,16 @@ python -m compileall -q backend
 python tests/validar_estructura.py
 ```
 
-Estas pruebas comprueban estructura y plantillas, **no sustituyen** una prueba real contra MySQL. Ver `PRUEBAS_ANTES_DE_ENTREGAR.md` para comprobar login por rol, alta/reprogramación/cierre, registro del historial y reportes. El sistema fue desarrollado para ejecución local, no para exposición directa a Internet.
+Estas pruebas comprueban estructura y plantillas, **no sustituyen** una prueba real contra MySQL. Además, se recomienda verificar manualmente:
+
+- Inicio y cierre de sesión con los roles **administrador** y **planillero**, confirmando las restricciones de acceso.
+- Alta de jugadores, equipos y partidos, así como validaciones de plantel y programación.
+- Registro de planillas, goles y tarjetas, y cierre de un partido cuando corresponde.
+- Postergación y reprogramación de un partido; comprobar que las transiciones se guarden en `historial_estado_partido`.
+- Visualización de los reportes y ejecución de `sql/07_auditoria_integridad.sql` sobre datos de prueba.
+
+El sistema fue desarrollado para ejecución local, no para exposición directa a Internet.
 
 ## 7. Referencias
 
-Explicaciones, decisiones de diseño, alternativas descartadas, bitácora y bibliografía: `docs/INFORME_FINAL_BD_I.docx`.
+Explicaciones, decisiones de diseño, alternativas descartadas, bitácora y bibliografía: `docs/Informe_BD1_2026_bitacora_narrativa.docx`.
